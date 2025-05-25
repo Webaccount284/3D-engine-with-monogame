@@ -9,14 +9,64 @@ using System.Security.Cryptography;
 
 namespace FormGame
 {
-    internal class Block
+    public class Block
     {
         public string name;
-        public Color[] colors;
-        public Block(string name, Color[] colors)
+        public Face[] textures;
+        public Block(string name, Face[] textures)
         {
             this.name = name;
-            this.colors = colors;
+            this.textures = textures;
+        }
+    }
+    public class Face
+    {
+        public Vector2 topLeft;
+        public Vector2 bottomRight;
+        public Face(Vector2 topLeft, Vector2 bottomRight)
+        {
+            this.topLeft = topLeft;
+            this.bottomRight = bottomRight;
+        }
+    }
+    public class Chunk
+    {
+        public const int worldHeight = 128;
+        public Block[,,] blocks = new Block[16, worldHeight, 16];
+        public Chunk()
+        {
+            Color brown = Color.FromNonPremultiplied(97, 72, 19, 255);
+            Face grassDirtFace = new Face(new Vector2(0 / 4f, 0), new Vector2(1 / 4f, 1));
+            Face dirtFace = new Face(new Vector2(1 / 4f, 0), new Vector2(2 / 4f, 1));
+            Face grassFace = new Face(new Vector2(2 / 4f, 0), new Vector2(3 / 4f, 1));
+            Face stoneFace = new Face(new Vector2(3 / 4f, 0), new Vector2(4 / 4f, 1));
+            Block grass = new Block("grass", [grassDirtFace, grassDirtFace, grassDirtFace, grassDirtFace, dirtFace, grassFace]);
+            Block dirt = new Block("dirt", [dirtFace, dirtFace, dirtFace, dirtFace, dirtFace, dirtFace]);
+            Block stone = new Block("stone", [stoneFace, stoneFace, stoneFace, stoneFace, stoneFace, stoneFace]);
+            for (int i = 0; i < 16; i++)
+            {
+                for (int k = 0; k < 16; k++)
+                {
+                    Random rand = new Random();
+                    int h = rand.Next(58, 61);
+                    for (int j = 0; j < worldHeight; j++)
+                    {
+                        if (j < h - 5)
+                        {
+                            blocks[i, j, k] = stone;
+                        }
+                        else if (j < h)
+                        {
+                            blocks[i, j, k] = dirt;
+                        }
+                        else if (j == h)
+                        {
+                            blocks[i, j, k] = grass;
+                        }
+
+                    }
+                }
+            }
         }
     }
     public class Game : Microsoft.Xna.Framework.Game
@@ -35,14 +85,16 @@ namespace FormGame
         //BasicEffect for rendering
         BasicEffect basicEffect;
 
+
         //Geometric info
-        VertexPositionColor[] triangleVertices;
+        VertexPositionTexture[] triangleVertices;
         Microsoft.Xna.Framework.Graphics.VertexBuffer vertexBuffer;
         int triangleCount;
+        Texture2D tileSheet;
 
         //Map info
-        Block[,,] blocks;
-        int width = 32, height = 16, length = 32;
+        const int chunkWidth = 1, chunkLength = 1;
+        Chunk[,] chunks = new Chunk[chunkWidth, chunkLength];
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -56,85 +108,59 @@ namespace FormGame
             //Setup Camera
             camAngle = new Microsoft.Xna.Framework.Vector2(0f, 0f); // angles of the camera
             camTarget = new Microsoft.Xna.Framework.Vector3(0f, 0f, 0f); // targeted point
-            camPosition = new Microsoft.Xna.Framework.Vector3(0f, 0f, -100f);
+            camPosition = new Microsoft.Xna.Framework.Vector3(0f, 16*60f, -100f);
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), GraphicsDevice.DisplayMode.AspectRatio, 1f, 4000f);
             viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, new Microsoft.Xna.Framework.Vector3(0f, 1f, 0f));// Y up
             worldMatrix = Matrix.CreateWorld(camTarget, Microsoft.Xna.Framework.Vector3.Forward, Microsoft.Xna.Framework.Vector3.Up);
 
             //Create blocks
-            Color brown = Color.FromNonPremultiplied(97, 72, 19, 255);
-            Block grass = new Block("grass", [brown, brown, brown, brown, brown, Color.Green]);
-            Block stone = new Block("stone", [Color.Gray, Color.Gray, Color.Gray, Color.Gray, Color.Gray, Color.Gray]);
-            blocks = new Block[width, height, length];
-            blocks[0, 0, 0] = stone;
-            blocks[0, 1, 0] = stone;
-            blocks[0, 2, 0] = grass;
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < chunkWidth; i++)
             {
-                for (int j = 0; j < length; j++)
+                for (int j = 0; j < chunkLength; j++)
                 {
-                    blocks[i, 0, j] = stone;
-                    blocks[i, 1, j] = stone;
-                    blocks[i, 2, j] = stone;
-                    Random rand = new Random();
-                    int r = rand.Next(0, 3);
-                    if (r == 0)
-                    {
-                        blocks[i, 3, j] = grass;
-                    }
-                    else if (r==1)
-                    {
-                        blocks[i, 3, j] = stone;
-                        blocks[i, 4, j] = grass;
-                    }
-                    else if (r == 2)
-                    {
-                        blocks[i, 3, j] = stone;
-                        blocks[i, 4, j] = stone;
-                        blocks[i, 5, j] = grass;
-                    }
-                    else if (r == 3)
-                    {
-                        blocks[i, 3, j] = stone;
-                        blocks[i, 4, j] = stone;
-                        blocks[i, 5, j] = stone;
-                        blocks[i, 6, j] = grass;
-                    }
+                    chunks[i, j] = new Chunk();
                 }
             }
+
 
             //BasicEffect
             basicEffect = new BasicEffect(GraphicsDevice);
             basicEffect.Alpha = 1f;
+            basicEffect.TextureEnabled = true;
+            basicEffect.Texture = tileSheet;
 
             // Want to see the colors of the vertices, this needs to be on
-            basicEffect.VertexColorEnabled = true;
-
-            //Lighting requires normal information which VertexPositionColor does not have
-            //If you want to use lighting and VPC you need to create a custom def
             basicEffect.LightingEnabled = false;
 
             //Geometry
             triangleVertices = LoadBlocks();
             triangleCount = triangleVertices.Length / 3;
-            vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionColor), triangleCount * 3, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionColor>(triangleVertices);
+            vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), triangleCount * 3, BufferUsage.WriteOnly);
+            vertexBuffer.SetData<VertexPositionTexture>(triangleVertices);
         }
-        private VertexPositionColor[] LoadBlocks()
+        private VertexPositionTexture[] LoadBlocks()
         {
-            List<VertexPositionColor> u = new List<VertexPositionColor>();
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
+            List<VertexPositionTexture> u = new List<VertexPositionTexture>();
+            for (int b = 0; b < chunkWidth; b++)
+            {       for (int c = 0; c < chunkLength; c++)
                 {
-                    for (int k = 0; k < length; k++)
+                    for (int i = 0; i < 16; i++)
                     {
-                        if (blocks[i, j, k] != null)
+                        for (int j = 0; j < Chunk.worldHeight; j++)
                         {
-                            VertexPositionColor[] v = CreateBlock(new Vector3(i * 16, j * 16, k * 16), 16, blocks[i, j, k].colors);
-                            for (int l = 0; l < v.Length; l++)
+                            for (int k = 0; k < 16; k++)
                             {
-                                u.Add(v[l]);
+                                if (chunks[b,c] != null)
+                                {
+                                    if (chunks[b, c].blocks[i, j, k] != null)
+                                    {
+                                        VertexPositionTexture[] v = CreateBlock(new Vector3(b * (16 * 16) + i * 16, j * 16, c * (16 * 16) + k * 16), 16, chunks[b, c].blocks[i, j, k].textures);
+                                        for (int l = 0; l < v.Length; l++)
+                                        {
+                                            u.Add(v[l]);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -142,62 +168,63 @@ namespace FormGame
             }
             return u.ToArray();
         }
-        private VertexPositionColor[] CreateBlock(Vector3 position, float size, Color[] colors)
+        private VertexPositionTexture[] CreateBlock(Vector3 position, float size, Face[] textures)
         {
             float x = position.X;
             float y = position.Y;
             float z = position.Z;
 
-            VertexPositionColor[] u = new VertexPositionColor[36];
-
+            VertexPositionTexture[] u = new VertexPositionTexture[36];
+            
             // front face
-            u[0] = new VertexPositionColor(new Vector3(x, y, z), colors[0]); 
-            u[1] = new VertexPositionColor(new Vector3(x + size, y, z), colors[0]);
-            u[2] = new VertexPositionColor(new Vector3(x + size, y + size, z), colors[0]);
-            u[3] = new VertexPositionColor(new Vector3(x, y, z), colors[0]);
-            u[4] = new VertexPositionColor(new Vector3(x, y + size, z), colors[0]);
-            u[5] = new VertexPositionColor(new Vector3(x + size, y + size, z), colors[0]);
+            u[0] = new VertexPositionTexture(new Vector3(x, y, z), textures[0].bottomRight); 
+            u[1] = new VertexPositionTexture(new Vector3(x + size, y, z), new Vector2(textures[0].topLeft.X, textures[0].bottomRight.Y));
+            u[2] = new VertexPositionTexture(new Vector3(x + size, y + size, z), textures[0].topLeft);
+            u[3] = new VertexPositionTexture(new Vector3(x, y, z), textures[0].bottomRight);
+            u[4] = new VertexPositionTexture(new Vector3(x, y + size, z), new Vector2(textures[0].bottomRight.X, textures[0].topLeft.Y));
+            u[5] = new VertexPositionTexture(new Vector3(x + size, y + size, z), textures[0].topLeft);
             // back face
-            u[6] = new VertexPositionColor(new Vector3(x, y, z + size), colors[1]);
-            u[7] = new VertexPositionColor(new Vector3(x + size, y, z + size), colors[1]);
-            u[8] = new VertexPositionColor(new Vector3(x + size, y + size, z + size), colors[1]);
-            u[9] = new VertexPositionColor(new Vector3(x, y, z + size), colors[1]);
-            u[10] = new VertexPositionColor(new Vector3(x, y + size, z + size), colors[1]);
-            u[11] = new VertexPositionColor(new Vector3(x + size, y + size, z + size), colors[1]);
+            u[6] = new VertexPositionTexture(new Vector3(x, y, z + size), textures[1].bottomRight);
+            u[7] = new VertexPositionTexture(new Vector3(x + size, y, z + size), new Vector2(textures[1].topLeft.X, textures[1].bottomRight.Y));
+            u[8] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[0].topLeft);
+            u[9] = new VertexPositionTexture(new Vector3(x, y, z + size), textures[1].bottomRight);
+            u[10] = new VertexPositionTexture(new Vector3(x, y + size, z + size), new Vector2(textures[1].bottomRight.X, textures[1].topLeft.Y));
+            u[11] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[1].topLeft);
             // right face
-            u[12] = new VertexPositionColor(new Vector3(x, y, z), colors[2]);
-            u[13] = new VertexPositionColor(new Vector3(x, y, z + size), colors[2]);
-            u[14] = new VertexPositionColor(new Vector3(x, y + size, z + size), colors[2]);
-            u[15] = new VertexPositionColor(new Vector3(x, y, z), colors[2]);
-            u[16] = new VertexPositionColor(new Vector3(x, y + size, z), colors[2]);
-            u[17] = new VertexPositionColor(new Vector3(x, y + size, z + size), colors[2]);
+            u[12] = new VertexPositionTexture(new Vector3(x, y, z), textures[2].bottomRight);
+            u[13] = new VertexPositionTexture(new Vector3(x, y, z + size), new Vector2(textures[2].topLeft.X, textures[2].bottomRight.Y));
+            u[14] = new VertexPositionTexture(new Vector3(x, y + size, z + size), textures[2].topLeft);
+            u[15] = new VertexPositionTexture(new Vector3(x, y, z), textures[2].bottomRight);
+            u[16] = new VertexPositionTexture(new Vector3(x, y + size, z), new Vector2(textures[2].bottomRight.X, textures[2].topLeft.Y));
+            u[17] = new VertexPositionTexture(new Vector3(x, y + size, z + size), textures[2].topLeft);
             // left face
-            u[18] = new VertexPositionColor(new Vector3(x + size, y, z), colors[3]);
-            u[19] = new VertexPositionColor(new Vector3(x + size, y, z + size), colors[3]);
-            u[20] = new VertexPositionColor(new Vector3(x + size, y + size, z + size), colors[3]);
-            u[21] = new VertexPositionColor(new Vector3(x + size, y, z), colors[3]);
-            u[22] = new VertexPositionColor(new Vector3(x + size, y + size, z), colors[3]);
-            u[23] = new VertexPositionColor(new Vector3(x + size, y + size, z + size), colors[3]);
+            u[18] = new VertexPositionTexture(new Vector3(x + size, y, z), textures[3].bottomRight);
+            u[19] = new VertexPositionTexture(new Vector3(x + size, y, z + size), new Vector2(textures[3].topLeft.X, textures[3].bottomRight.Y));
+            u[20] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[3].topLeft);
+            u[21] = new VertexPositionTexture(new Vector3(x + size, y, z), textures[3].bottomRight);
+            u[22] = new VertexPositionTexture(new Vector3(x + size, y + size, z), new Vector2(textures[3].bottomRight.X, textures[3].topLeft.Y));
+            u[23] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[3].topLeft);
             // bottom face
-            u[24] = new VertexPositionColor(new Vector3(x, y, z), colors[4]);
-            u[25] = new VertexPositionColor(new Vector3(x + size, y, z), colors[4]);
-            u[26] = new VertexPositionColor(new Vector3(x + size, y, z + size), colors[4]);
-            u[27] = new VertexPositionColor(new Vector3(x, y, z), colors[4]);
-            u[28] = new VertexPositionColor(new Vector3(x, y, z + size), colors[4]);
-            u[29] = new VertexPositionColor(new Vector3(x + size, y, z + size), colors[4]);
+            u[24] = new VertexPositionTexture(new Vector3(x, y, z), textures[4].topLeft);
+            u[25] = new VertexPositionTexture(new Vector3(x + size, y, z), new Vector2(textures[4].topLeft.X, textures[4].bottomRight.Y));
+            u[26] = new VertexPositionTexture(new Vector3(x + size, y, z + size), textures[4].bottomRight);
+            u[27] = new VertexPositionTexture(new Vector3(x, y, z), textures[4].topLeft);
+            u[28] = new VertexPositionTexture(new Vector3(x, y, z + size), new Vector2(textures[4].bottomRight.X, textures[4].topLeft.Y));
+            u[29] = new VertexPositionTexture(new Vector3(x + size, y, z + size), textures[4].bottomRight);
             // top face
-            u[30] = new VertexPositionColor(new Vector3(x, y + size, z), colors[5]);
-            u[31] = new VertexPositionColor(new Vector3(x + size, y + size, z), colors[5]);
-            u[32] = new VertexPositionColor(new Vector3(x + size, y + size, z + size), colors[5]);
-            u[33] = new VertexPositionColor(new Vector3(x, y + size, z), colors[5]);
-            u[34] = new VertexPositionColor(new Vector3(x, y + size, z + size), colors[5]);
-            u[35] = new VertexPositionColor(new Vector3(x + size, y + size, z + size), colors[5]);
+            u[30] = new VertexPositionTexture(new Vector3(x, y + size, z), textures[5].topLeft);
+            u[31] = new VertexPositionTexture(new Vector3(x + size, y + size, z), new Vector2(textures[5].topLeft.X, textures[5].bottomRight.Y));
+            u[32] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[5].bottomRight);
+            u[33] = new VertexPositionTexture(new Vector3(x, y + size, z), textures[5].topLeft);
+            u[34] = new VertexPositionTexture(new Vector3(x, y + size, z + size), new Vector2(textures[5].bottomRight.X, textures[5].topLeft.Y));
+            u[35] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[5].bottomRight);
 
             return u;
         }
         protected override void LoadContent()
         {
-            spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice); 
+            spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(GraphicsDevice);
+            tileSheet = Content.Load<Texture2D>("texturesheet");
         }
 
         protected override void UnloadContent()
@@ -297,6 +324,7 @@ namespace FormGame
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
             GraphicsDevice.SetVertexBuffer(vertexBuffer);
+            GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
             //Turn off culling so we see both sides of our rendered triangle
             RasterizerState rasterizerState = new RasterizerState();
