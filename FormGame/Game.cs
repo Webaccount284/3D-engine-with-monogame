@@ -181,19 +181,19 @@ namespace FormGame
             u[1] = new VertexPositionTexture(new Vector3(x + size, y, z), new Vector2(textures[0].topLeft.X, textures[0].bottomRight.Y));
             u[2] = new VertexPositionTexture(new Vector3(x + size, y + size, z), textures[0].topLeft);
             u[3] = new VertexPositionTexture(new Vector3(x, y, z), textures[0].bottomRight);
-            u[4] = new VertexPositionTexture(new Vector3(x, y + size, z), new Vector2(textures[0].bottomRight.X, textures[0].topLeft.Y));
-            u[5] = new VertexPositionTexture(new Vector3(x + size, y + size, z), textures[0].topLeft);
+            u[5] = new VertexPositionTexture(new Vector3(x, y + size, z), new Vector2(textures[0].bottomRight.X, textures[0].topLeft.Y));
+            u[4] = new VertexPositionTexture(new Vector3(x + size, y + size, z), textures[0].topLeft);
             // back face
             u[6] = new VertexPositionTexture(new Vector3(x, y, z + size), textures[1].bottomRight);
-            u[7] = new VertexPositionTexture(new Vector3(x + size, y, z + size), new Vector2(textures[1].topLeft.X, textures[1].bottomRight.Y));
-            u[8] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[0].topLeft);
+            u[8] = new VertexPositionTexture(new Vector3(x + size, y, z + size), new Vector2(textures[1].topLeft.X, textures[1].bottomRight.Y));
+            u[7] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[0].topLeft);
             u[9] = new VertexPositionTexture(new Vector3(x, y, z + size), textures[1].bottomRight);
             u[10] = new VertexPositionTexture(new Vector3(x, y + size, z + size), new Vector2(textures[1].bottomRight.X, textures[1].topLeft.Y));
             u[11] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[1].topLeft);
             // right face
             u[12] = new VertexPositionTexture(new Vector3(x, y, z), textures[2].bottomRight);
-            u[13] = new VertexPositionTexture(new Vector3(x, y, z + size), new Vector2(textures[2].topLeft.X, textures[2].bottomRight.Y));
-            u[14] = new VertexPositionTexture(new Vector3(x, y + size, z + size), textures[2].topLeft);
+            u[14] = new VertexPositionTexture(new Vector3(x, y, z + size), new Vector2(textures[2].topLeft.X, textures[2].bottomRight.Y));
+            u[13] = new VertexPositionTexture(new Vector3(x, y + size, z + size), textures[2].topLeft);
             u[15] = new VertexPositionTexture(new Vector3(x, y, z), textures[2].bottomRight);
             u[16] = new VertexPositionTexture(new Vector3(x, y + size, z), new Vector2(textures[2].bottomRight.X, textures[2].topLeft.Y));
             u[17] = new VertexPositionTexture(new Vector3(x, y + size, z + size), textures[2].topLeft);
@@ -202,12 +202,12 @@ namespace FormGame
             u[19] = new VertexPositionTexture(new Vector3(x + size, y, z + size), new Vector2(textures[3].topLeft.X, textures[3].bottomRight.Y));
             u[20] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[3].topLeft);
             u[21] = new VertexPositionTexture(new Vector3(x + size, y, z), textures[3].bottomRight);
-            u[22] = new VertexPositionTexture(new Vector3(x + size, y + size, z), new Vector2(textures[3].bottomRight.X, textures[3].topLeft.Y));
-            u[23] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[3].topLeft);
+            u[23] = new VertexPositionTexture(new Vector3(x + size, y + size, z), new Vector2(textures[3].bottomRight.X, textures[3].topLeft.Y));
+            u[22] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[3].topLeft);
             // bottom face
             u[24] = new VertexPositionTexture(new Vector3(x, y, z), textures[4].topLeft);
-            u[25] = new VertexPositionTexture(new Vector3(x + size, y, z), new Vector2(textures[4].topLeft.X, textures[4].bottomRight.Y));
-            u[26] = new VertexPositionTexture(new Vector3(x + size, y, z + size), textures[4].bottomRight);
+            u[26] = new VertexPositionTexture(new Vector3(x + size, y, z), new Vector2(textures[4].topLeft.X, textures[4].bottomRight.Y));
+            u[25] = new VertexPositionTexture(new Vector3(x + size, y, z + size), textures[4].bottomRight);
             u[27] = new VertexPositionTexture(new Vector3(x, y, z), textures[4].topLeft);
             u[28] = new VertexPositionTexture(new Vector3(x, y, z + size), new Vector2(textures[4].bottomRight.X, textures[4].topLeft.Y));
             u[29] = new VertexPositionTexture(new Vector3(x + size, y, z + size), textures[4].bottomRight);
@@ -216,8 +216,8 @@ namespace FormGame
             u[31] = new VertexPositionTexture(new Vector3(x + size, y + size, z), new Vector2(textures[5].topLeft.X, textures[5].bottomRight.Y));
             u[32] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[5].bottomRight);
             u[33] = new VertexPositionTexture(new Vector3(x, y + size, z), textures[5].topLeft);
-            u[34] = new VertexPositionTexture(new Vector3(x, y + size, z + size), new Vector2(textures[5].bottomRight.X, textures[5].topLeft.Y));
-            u[35] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[5].bottomRight);
+            u[35] = new VertexPositionTexture(new Vector3(x, y + size, z + size), new Vector2(textures[5].bottomRight.X, textures[5].topLeft.Y));
+            u[34] = new VertexPositionTexture(new Vector3(x + size, y + size, z + size), textures[5].bottomRight);
 
             return u;
         }
@@ -328,7 +328,7 @@ namespace FormGame
 
             //Turn off culling so we see both sides of our rendered triangle
             RasterizerState rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.None;
+            rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
             GraphicsDevice.RasterizerState = rasterizerState;
 
             foreach (EffectPass pass in basicEffect.CurrentTechnique.Passes)
