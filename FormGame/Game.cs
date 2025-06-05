@@ -87,7 +87,7 @@ namespace FormGame
 
 
         //Geometric info
-        VertexPositionTexture[] triangleVertices;
+        public VertexPositionTexture[] triangleVertices;
         Microsoft.Xna.Framework.Graphics.VertexBuffer vertexBuffer;
         int triangleCount;
         Texture2D tileSheet;
@@ -108,12 +108,13 @@ namespace FormGame
             //Setup Camera
             camAngle = new Microsoft.Xna.Framework.Vector2(0f, 0f); // angles of the camera
             camTarget = new Microsoft.Xna.Framework.Vector3(0f, 0f, 0f); // targeted point
-            camPosition = new Microsoft.Xna.Framework.Vector3(0f, 16*60f, -100f);
+            camPosition = new Microsoft.Xna.Framework.Vector3(0f, 0f, -100f);
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), GraphicsDevice.DisplayMode.AspectRatio, 1f, 4000f);
             viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, new Microsoft.Xna.Framework.Vector3(0f, 1f, 0f));// Y up
             worldMatrix = Matrix.CreateWorld(camTarget, Microsoft.Xna.Framework.Vector3.Forward, Microsoft.Xna.Framework.Vector3.Up);
 
             //Create blocks
+            /*
             for (int i = 0; i < chunkWidth; i++)
             {
                 for (int j = 0; j < chunkLength; j++)
@@ -121,7 +122,7 @@ namespace FormGame
                     chunks[i, j] = new Chunk();
                 }
             }
-
+            */
 
             //BasicEffect
             basicEffect = new BasicEffect(GraphicsDevice);
@@ -133,7 +134,7 @@ namespace FormGame
             basicEffect.LightingEnabled = false;
 
             //Geometry
-            triangleVertices = LoadBlocks();
+            // triangleVertices = LoadBlocks();
             triangleCount = triangleVertices.Length / 3;
             vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), triangleCount * 3, BufferUsage.WriteOnly);
             vertexBuffer.SetData<VertexPositionTexture>(triangleVertices);
