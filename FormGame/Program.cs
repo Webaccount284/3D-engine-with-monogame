@@ -62,18 +62,16 @@ class Program
     {
         Mesh cube = new Mesh(
             [
-            new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0)),
-            new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
-            new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(0, 1),  new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
-            new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(0, 1),  new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
 
-            new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
-            new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
-            new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
-            new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0))
-            
-            ]
-                );
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0))
+            ]);
         var game = new FormGame.Game();
         game.triangleVertices = cube.GetMeshAsTriangles(new Vector3(0, 0, 0));
         game.Run();
