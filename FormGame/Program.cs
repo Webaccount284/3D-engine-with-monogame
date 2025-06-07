@@ -17,6 +17,20 @@ internal class Mesh : Object
     {
         this.triangles = triangles;
     }
+    public Mesh(Mesh[] meshes, Vector3[] positions)
+    {
+        List<Triangle3D> tris = new List<Triangle3D>();
+        for (int i = 0; i < meshes.Length; i++)
+        {
+            Triangle3D[] newTris = new Triangle3D[meshes[i].triangles.Length];
+            for (int j = 0; j < meshes[i].triangles.Count();  j++)
+            {
+                newTris[j] = meshes[i].triangles[j].ApplyTransform(positions[i]);
+            }
+            tris.AddRange(newTris);
+        }
+        this.triangles = tris.ToArray();
+    }
     public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
     {
         List<VertexPositionTexture> textures = new List<VertexPositionTexture>();
@@ -55,6 +69,10 @@ internal class Triangle3D : Object
         new VertexPositionTexture(p3 + transform, v3)];
         return vertexPositionTextures;
     }
+    public Triangle3D ApplyTransform(Vector3 transform)
+    {
+        return new Triangle3D(p1 + transform, p2 + transform, p3 + transform, v1, v2, v3);
+    }
 }
 class Program
 {
@@ -70,10 +88,16 @@ class Program
                 new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
                 new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
                 new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0))
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0)),
+
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(1/4f, 0), new Vector2(2/4f, 1), new Vector2(2/4f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(1/4f, 0), new Vector2(1/4f, 1), new Vector2(2/4f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(2/4f, 0), new Vector2(3/4f, 0),new Vector2(3/4f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(2/4f, 0), new Vector2(3/4f, 1), new Vector2(2/4f, 1))
             ]);
+        Mesh cubes = new Mesh([cube, cube], [new Vector3(0, 0, 0), new Vector3(20, 0, 20)]);
         var game = new FormGame.Game();
-        game.triangleVertices = cube.GetMeshAsTriangles(new Vector3(0, 0, 0));
+        game.triangleVertices = cubes.GetMeshAsTriangles(new Vector3(0, 0, 0));
         game.Run();
         game.Dispose();
     }
