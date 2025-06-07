@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using SharpDX.Direct3D9;
 using System.Linq;
+using Microsoft.Xna.Framework.Audio;
 
 public abstract class Object
 {
@@ -78,24 +79,77 @@ class Program
 {
     static void Main(string[] args)
     {
-        Mesh cube = new Mesh(
+        Mesh grassCube = new Mesh(
             [
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(0, 1),  new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(0, 1), new Vector2(1/5f, 0), new Vector2(0, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/5f, 1), new Vector2(1/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(0, 1),  new Vector2(1/5f, 0), new Vector2(1/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/5f, 0)),
 
-                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/4f, 0)),
-                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(1/4f, 1)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 1), new Vector2(1/4f, 0)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/4f, 0), new Vector2(0, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(0, 0), new Vector2(1/5f, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(0, 1), new Vector2(1/5f, 0), new Vector2(1/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(0, 1), new Vector2(1/5f, 1), new Vector2(1/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(0, 1), new Vector2(1/5f, 0), new Vector2(0, 0)),
 
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(1/4f, 0), new Vector2(2/4f, 1), new Vector2(2/4f, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(1/4f, 0), new Vector2(1/4f, 1), new Vector2(2/4f, 1)),
-                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(2/4f, 0), new Vector2(3/4f, 0),new Vector2(3/4f, 1)),
-                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(2/4f, 0), new Vector2(3/4f, 1), new Vector2(2/4f, 1))
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(1/5f, 0), new Vector2(2/5f, 1), new Vector2(2/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(1/5f, 0), new Vector2(1/5f, 1), new Vector2(2/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(2/5f, 0), new Vector2(3/5f, 0),new Vector2(3/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(2/5f, 0), new Vector2(3/5f, 1), new Vector2(2/5f, 1))
             ]);
-        Mesh cubes = new Mesh([cube, cube], [new Vector3(0, 0, 0), new Vector3(20, 0, 20)]);
+        Mesh dirtCube = new Mesh(
+            [
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(1/5f, 1), new Vector2(2/5f, 0), new Vector2(1/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(1/5f, 1), new Vector2(2/5f, 1), new Vector2(2/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(1/5f, 1),  new Vector2(2/5f, 0), new Vector2(2/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(1/5f, 1), new Vector2(1/5f, 0), new Vector2(2/5f, 0)),
+
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(1/5f, 1), new Vector2(1/5f, 0), new Vector2(2/5f, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(1/5f, 1), new Vector2(2/5f, 0), new Vector2(2/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(1/5f, 1), new Vector2(2/5f, 1), new Vector2(2/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(1/5f, 1), new Vector2(2/5f, 0), new Vector2(1/5f, 0)),
+
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(1/5f, 0), new Vector2(2/5f, 1), new Vector2(2/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(1/5f, 0), new Vector2(1/5f, 1), new Vector2(2/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(1/5f, 0), new Vector2(2/5f, 0),new Vector2(2/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(1/5f, 0), new Vector2(2/5f, 1), new Vector2(1/5f, 1))
+            ]);
+
+        Mesh stoneCube = new Mesh(
+            [
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(3/5f, 1), new Vector2(4/5f, 0), new Vector2(3/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(3/5f, 1), new Vector2(4/5f, 1), new Vector2(4/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(3/5f, 1),  new Vector2(4/5f, 0), new Vector2(4/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(3/5f, 1), new Vector2(3/5f, 0), new Vector2(4/5f, 0)),
+
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(3/5f, 1), new Vector2(3/5f, 0), new Vector2(4/5f, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(3/5f, 1), new Vector2(4/5f, 0), new Vector2(4/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(3/5f, 1), new Vector2(4/5f, 1), new Vector2(4/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(3/5f, 1), new Vector2(4/5f, 0), new Vector2(3/5f, 0)),
+
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(3/5f, 0), new Vector2(4/5f, 1), new Vector2(4/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(3/5f, 0), new Vector2(3/5f, 1), new Vector2(4/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(3/5f, 0), new Vector2(4/5f, 0),new Vector2(4/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(3/5f, 0), new Vector2(4/5f, 1), new Vector2(3/5f, 1))
+            ]);
+
+        Mesh woodCube = new Mesh(
+            [
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(4/5f, 1), new Vector2(5/5f, 0), new Vector2(4/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(4/5f, 1), new Vector2(5/5f, 1), new Vector2(5/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(4/5f, 1),  new Vector2(5/5f, 0), new Vector2(5/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(4/5f, 1), new Vector2(4/5f, 0), new Vector2(5/5f, 0)),
+
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(4/5f, 1), new Vector2(4/5f, 0), new Vector2(5/5f, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(4/5f, 1), new Vector2(5/5f, 0), new Vector2(5/5f, 1)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(4/5f, 1), new Vector2(5/5f, 1), new Vector2(5/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(4/5f, 1), new Vector2(5/5f, 0), new Vector2(4/5f, 0)),
+
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(4/5f, 0), new Vector2(5/5f, 1), new Vector2(5/5f, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(4/5f, 0), new Vector2(4/5f, 1), new Vector2(5/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(4/5f, 0), new Vector2(5/5f, 0),new Vector2(5/5f, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(4/5f, 0), new Vector2(5/5f, 1), new Vector2(4/5f, 1))
+            ]);
+        Mesh cubes = new Mesh([grassCube, dirtCube, woodCube, stoneCube], [new Vector3(0, 0, 0), new Vector3(0, 0, 20), new Vector3(20, 0, 0), new Vector3(20, 0, 20)]);
         var game = new FormGame.Game();
         game.triangleVertices = cubes.GetMeshAsTriangles(new Vector3(0, 0, 0));
         game.Run();
