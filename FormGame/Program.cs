@@ -77,7 +77,14 @@ internal class Triangle3D : Object
 }
 class Program
 {
-    static float tcf = 5f; // the number of texture squares on tile map
+    static float tcf = 6f; // the number of texture squares on tile map
+
+    static Mesh grassCube = CreateCube([0, 0, 0, 0, 1, 2]);
+    static Mesh dirtCube = CreateCube([1, 1, 1, 1, 1, 1]);
+    static Mesh stoneCube = CreateCube([3, 3, 3, 3, 3, 3]);
+    static Mesh woodCube = CreateCube([4, 4, 4, 4, 4, 4]);
+    static Mesh bedrock = CreateCube([5, 5, 5, 5, 5, 5]);
+    static int chunkWidth = 16, chunkHeight = 128, chunkDepth = 16;
     /// <summary>
     /// Returns a new mesh with cube faces defined by you
     /// </summary>
@@ -109,15 +116,62 @@ class Program
             ]);
         return cube;
     }
+    static private Mesh CreateBlockArray(int width, int height, int depth)
+    {
+        List<Mesh> chunk = new List<Mesh>();
+        List<Vector3> transforms = new List<Vector3>();
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < depth; j++)
+            {
+                Random rand = new Random();
+                int bHeight = rand.Next(1, 5);
+                int worldHeight = rand.Next(58, 63);
+                for (int k = 0; k < height; k++)
+                {
+                    if (k < bHeight)
+                    {
+                        chunk.Add(bedrock);
+                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
+                    }
+                    else if (k < worldHeight - 5)
+                    {
+                        chunk.Add(stoneCube);
+                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
+                    }
+                    else if (k < worldHeight)
+                    {
+                        chunk.Add(dirtCube);
+                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
+                    }
+                    else if (k == worldHeight)
+                    {
+                        chunk.Add(grassCube);
+                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
+                    }
+                }
+            }
+        }
+        return new Mesh(chunk.ToArray(), transforms.ToArray());
+    }
     static void Main(string[] args)
     {
-        Mesh grassCube = CreateCube([0, 0, 0, 0, 1, 2]);
-        Mesh dirtCube = CreateCube([1, 1, 1, 1, 1, 1]);
-        Mesh stoneCube = CreateCube([3, 3, 3, 3, 3, 3]);
-        Mesh woodCube = CreateCube([4, 4, 4, 4, 4, 4]);
-        Mesh cubes = new Mesh([grassCube, dirtCube, woodCube, stoneCube], [new Vector3(0, 0, 0), new Vector3(0, 0, 20), new Vector3(20, 0, 0), new Vector3(20, 0, 20)]);
+
+        // Mesh world = new Mesh([grassCube, dirtCube, woodCube, stoneCube, bedrock], [new Vector3(0, 0, 0), new Vector3(0, 0, 20), new Vector3(20, 0, 0), new Vector3(20, 0, 20), new Vector3(40, 0, 0)]);
+        Mesh chunks = new Mesh([
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth), 
+        ], [
+            new Vector3(0, 0, 0),
+            new Vector3(chunkWidth * 10 * 1, 0, 0),
+            new Vector3(0, 0, chunkDepth * 10 * 1),
+            new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 1),
+        ]);
         var game = new FormGame.Game();
-        game.triangleVertices = cubes.GetMeshAsTriangles(new Vector3(0, 0, 0));
+
+        game.triangleVertices = chunks.GetMeshAsTriangles(new Vector3(0, 0, 0));
         game.Run();
         game.Dispose();
     }
