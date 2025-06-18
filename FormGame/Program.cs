@@ -77,12 +77,13 @@ internal class Triangle3D : Object
 }
 class Program
 {
-    static float tcf = 6f; // the number of texture squares on tile map
+    static float tcf = 7f; // the number of texture squares on tile map
 
     static Mesh grassCube = CreateCube([0, 0, 0, 0, 1, 2]);
     static Mesh dirtCube = CreateCube([1, 1, 1, 1, 1, 1]);
     static Mesh stoneCube = CreateCube([3, 3, 3, 3, 3, 3]);
     static Mesh woodCube = CreateCube([4, 4, 4, 4, 4, 4]);
+    static Mesh diamond = CreateCube([6, 6, 6, 6, 6, 6]);
     static Mesh bedrock = CreateCube([5, 5, 5, 5, 5, 5]);
     static int chunkWidth = 16, chunkHeight = 128, chunkDepth = 16;
     /// <summary>
@@ -136,7 +137,14 @@ class Program
                     }
                     else if (k < worldHeight - 5)
                     {
-                        chunk.Add(stoneCube);
+                        if (rand.Next(0, 100) == 0)
+                        {
+                            chunk.Add(diamond);
+                        }
+                        else
+                        {
+                            chunk.Add(stoneCube);
+                        }
                         transforms.Add(new Vector3(i * 10, k * 10, j * 10));
                     }
                     else if (k < worldHeight)
@@ -162,15 +170,27 @@ class Program
             CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
             CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
             CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth), 
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
+            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth)
         ], [
             new Vector3(0, 0, 0),
             new Vector3(chunkWidth * 10 * 1, 0, 0),
+            new Vector3(chunkWidth * 10 * 2, 0, 0),
             new Vector3(0, 0, chunkDepth * 10 * 1),
             new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 1),
+            new Vector3(chunkWidth * 10 * 2, 0, chunkDepth * 10 * 1),
+            new Vector3(0, 0, chunkDepth * 10 * 2),
+            new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 2),
+            new Vector3(chunkWidth * 10 * 2, 0, chunkDepth * 10 * 2),
+            new Vector3(0, 0, chunkDepth * 10 * 3),
+            new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 3),
+            new Vector3(chunkWidth * 10 * 2, 0, chunkDepth * 10 * 3)
         ]);
         var game = new FormGame.Game();
-
         game.triangleVertices = chunks.GetMeshAsTriangles(new Vector3(0, 0, 0));
         game.Run();
         game.Dispose();
