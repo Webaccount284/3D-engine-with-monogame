@@ -150,12 +150,15 @@ public class World : Object
     public Vector2 size = new Vector2(0, 0);
     public World(Vector2 size)
     {
+
         // replace fixed 256 values with actual size
-        int[,] worldHeight = new int[256, 256];
-        int[,] worldHeight2 = new int[256, 256];
-        for (int x = 0; x < 256; x++)
+        int sizeX = (int)((size.X + 2) * Block.BLOCKSIZE * Chunk.WIDTH);
+        int sizeY = (int)((size.X + 2) * Block.BLOCKSIZE * Chunk.DEPTH);
+        int[,] worldHeight = new int[sizeX, sizeY];
+        int[,] worldHeight2 = new int[sizeX, sizeY];
+        for (int x = 0; x < sizeX; x++)
         {
-            for (int y = 0; y < 256; y++)
+            for (int y = 0; y < sizeY; y++)
             {
                 Random random = new Random();
                 worldHeight[x, y] = random.Next(0, 200);
@@ -163,16 +166,16 @@ public class World : Object
         }
         for (int i = 0; i < 40; i++)
         {
-            for (int x = 1; x < 255; x++)
+            for (int x = 1; x < sizeX - 1; x++)
             {
-                for (int y = 1; y < 255; y++)
+                for (int y = 1; y < sizeY - 1; y++)
                 {
                     worldHeight2[x, y] = (worldHeight[x - 1, y] + worldHeight[x + 1, y] + worldHeight[x, y - 1] + worldHeight[x, y + 1] + worldHeight[x, y]) / 5;
                 }
             }
-            for (int x = 0; x < 256; x++)
+            for (int x = 0; x < sizeX; x++)
             {
-                for (int y = 0; y < 256; y++)
+                for (int y = 0; y < sizeY; y++)
                 {
                     worldHeight[x, y] = worldHeight2[x, y];
                 }
