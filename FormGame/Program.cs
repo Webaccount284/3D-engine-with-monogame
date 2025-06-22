@@ -6,12 +6,208 @@ using System.Collections.Generic;
 using SharpDX.Direct3D9;
 using System.Linq;
 using Microsoft.Xna.Framework.Audio;
+using System.Net.PeerToPeer;
+using SharpDX.Direct3D11;
+public class Block : Object
+{
+    public int id;
+    public string name;
+    public Mesh mesh;
+    static float tcf = 8;
+    public const int BLOCKSIZE = 10;
+    public Block(int id, string name, Mesh mesh)
+    {
+        this.id = id;
+        this.name = name;
+        this.mesh = mesh;
+    }
 
+    public static Mesh CreateCubeMesh(int[] t)
+    {
+        if (t.Length != 6)
+        {
+            throw new ArgumentException("Wrong length of textures[]");
+        }
+        Mesh cube = new Mesh(
+            [
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(t[0]/tcf, 1), new Vector2((t[0] + 1)/tcf, 0), new Vector2(t[0]/tcf, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(t[0]/tcf, 1), new Vector2((t[0] + 1)/tcf, 1), new Vector2((t[0] + 1)/tcf, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(t[1]/tcf, 1),  new Vector2((t[1] + 1)/tcf, 0), new Vector2((t[1] + 1)/tcf, 1)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(t[1]/tcf, 1), new Vector2(t[1]/tcf, 0), new Vector2((t[1] + 1)/tcf, 0)),
+
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(t[2]/tcf, 1), new Vector2(t[2]/tcf, 0), new Vector2((t[2] + 1)/tcf, 0)),
+                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(t[2]/tcf, 1), new Vector2((t[2] + 1)/tcf, 0), new Vector2((t[2] + 1)/tcf, 1)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 1), new Vector2((t[3] + 1)/tcf, 0)),
+                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 0), new Vector2(t[3]/tcf, 0)),
+
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2((t[4] + 1)/tcf, 1), new Vector2((t[4] + 1)/tcf, 0)),
+                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2(t[4]/tcf, 1), new Vector2((t[4] + 1)/tcf, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 0),new Vector2((t[5] + 1)/tcf, 1)),
+                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 1), new Vector2(t[5]/tcf, 1))
+            ]);
+        return cube;
+    }
+    public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
+    {
+        if (id < 0)
+        {
+            return [];
+        }
+        else
+        {
+            return mesh.GetMeshAsTriangles(transform);
+        }
+    }
+}
+public class Chunk : Object
+{
+    public Vector2 position;
+    public Block[,,] data;
+    public const int WIDTH = 16, DEPTH = 16, HEIGHT = 256;
+
+    static Block air = new Block(-1, "Air Block", Block.CreateCubeMesh([0, 0, 0, 0, 0, 0]));
+    static Block grassBlock = new Block(0, "Grass Block", Block.CreateCubeMesh([0, 0, 0, 0, 1, 2]));
+    static Block dirtBlock = new Block(1, "Dirt Block", Block.CreateCubeMesh([1, 1, 1, 1, 1, 1]));
+    static Block stoneBlock = new Block(2, "Stone Block", Block.CreateCubeMesh([3, 3, 3, 3, 3, 3]));
+    static Block woodPlank = new Block(3, "Wood Planks", Block.CreateCubeMesh([4, 4, 4, 4, 4, 4]));
+    static Block diamondOre = new Block(4, "Diamond Ore", Block.CreateCubeMesh([6, 6, 6, 6, 6, 6]));
+    static Block bedrock = new Block(5, "Bedrock", Block.CreateCubeMesh([5, 5, 5, 5, 5, 5]));
+    static Block leaves = new Block(6, "Leaves", Block.CreateCubeMesh([7, 7, 7, 7, 7, 7]));
+    public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
+    {
+        List<VertexPositionTexture> mesh = new List<VertexPositionTexture>();
+        for (int i = 0; i < WIDTH; i++)
+        {
+            for (int j = 0; j < DEPTH; j++)
+            {
+                for (int k = 0; k < HEIGHT; k++)
+                {
+                    mesh.AddRange(data[i, j, k].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                }
+            }
+        }
+        return mesh.ToArray();
+    }
+    public void CreateBlockArray(int[,] heights, Vector2 vec)
+    {
+        Block[,,] chunk = new Block[WIDTH, DEPTH, HEIGHT];
+        for (int i = 0; i < WIDTH; i++)
+        {
+            for (int j = 0; j < DEPTH; j++)
+            {
+                Random rand = new Random();
+                int bHeight = rand.Next(1, 5);
+                int worldHeight = heights[(int)(i + vec.X * DEPTH), (int)(j + vec.Y * DEPTH)];
+                for (int k = 0; k < HEIGHT; k++)
+                {
+                    if (k < bHeight)
+                    {
+                        chunk[i, j, k] = bedrock;
+                    }
+                    else if (k < worldHeight - 5)
+                    {
+                        if (rand.Next(0, 100) == 0)
+                        {
+                            chunk[i, j, k] = diamondOre;
+                        }
+                        else
+                        {
+                            chunk[i, j, k] = stoneBlock;
+                        }
+                    }
+                    else if (k < worldHeight)
+                    {
+                        chunk[i, j, k] = dirtBlock;
+                    }
+                    else if (k == worldHeight)
+                    {
+                        chunk[i, j, k] = grassBlock;
+                    }
+                    else if (k == worldHeight + 1)
+                    {
+                        if (rand.Next(0, 100) == 5)
+                        {
+                            chunk[i, j, k] = leaves;
+                        }
+                        else
+                        {
+                            chunk[i, j, k] = air;
+                        }
+                    }
+                    else
+                    {
+                        chunk[i, j, k] = air;
+                    }
+                }
+            }
+        }
+        data = chunk;
+    }
+}
+public class World : Object
+{
+    public Chunk[,] chunks;
+    public Vector2 size = new Vector2(0, 0);
+    public World(Vector2 size)
+    {
+        // replace fixed 256 values with actual size
+        int[,] worldHeight = new int[256, 256];
+        int[,] worldHeight2 = new int[256, 256];
+        for (int x = 0; x < 256; x++)
+        {
+            for (int y = 0; y < 256; y++)
+            {
+                Random random = new Random();
+                worldHeight[x, y] = random.Next(0, 200);
+            }
+        }
+        for (int i = 0; i < 40; i++)
+        {
+            for (int x = 1; x < 255; x++)
+            {
+                for (int y = 1; y < 255; y++)
+                {
+                    worldHeight2[x, y] = (worldHeight[x - 1, y] + worldHeight[x + 1, y] + worldHeight[x, y - 1] + worldHeight[x, y + 1] + worldHeight[x, y]) / 5;
+                }
+            }
+            for (int x = 0; x < 256; x++)
+            {
+                for (int y = 0; y < 256; y++)
+                {
+                    worldHeight[x, y] = worldHeight2[x, y];
+                }
+            }
+
+        }
+        this.size = size;
+        chunks = new Chunk[(int)size.X, (int)size.Y];
+        for (int i = 0; i < size.X; i++)
+        {
+            for (int j = 0; j < size.Y; j++)
+            {
+                chunks[i, j] = new Chunk();
+                chunks[i, j].CreateBlockArray(worldHeight, new Vector2(i + 1, j + 1));
+            }
+        }
+    }
+    public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
+    {
+        List<VertexPositionTexture> mesh = new List<VertexPositionTexture>();
+        for (int i = 0; i < size.X; i++)
+        {
+            for (int j = 0; j < size.Y; j++)
+            {
+                mesh.AddRange(chunks[i, j].GetMeshAsTriangles(transform + new Vector3(i * Block.BLOCKSIZE * Chunk.WIDTH, 0, j * Block.BLOCKSIZE * Chunk.WIDTH)));
+            }
+        }
+        return mesh.ToArray();
+    }
+}
 public abstract class Object
 {
     abstract public VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform);
 }
-internal class Mesh : Object
+public class Mesh : Object
 {
     public Triangle3D[] triangles;
     public Mesh(Triangle3D[] triangles)
@@ -45,7 +241,7 @@ internal class Mesh : Object
         return textures.ToArray();
     }
 }
-internal class Triangle3D : Object
+public class Triangle3D : Object
 {
     public Vector3 p1 { get; set; }
     public Vector3 p2 { get; set; }
@@ -77,14 +273,7 @@ internal class Triangle3D : Object
 }
 class Program
 {
-    static float tcf = 7f; // the number of texture squares on tile map
 
-    static Mesh grassCube = CreateCube([0, 0, 0, 0, 1, 2]);
-    static Mesh dirtCube = CreateCube([1, 1, 1, 1, 1, 1]);
-    static Mesh stoneCube = CreateCube([3, 3, 3, 3, 3, 3]);
-    static Mesh woodCube = CreateCube([4, 4, 4, 4, 4, 4]);
-    static Mesh diamond = CreateCube([6, 6, 6, 6, 6, 6]);
-    static Mesh bedrock = CreateCube([5, 5, 5, 5, 5, 5]);
     static int chunkWidth = 16, chunkHeight = 128, chunkDepth = 16;
     /// <summary>
     /// Returns a new mesh with cube faces defined by you
@@ -92,106 +281,13 @@ class Program
     /// <param name="textures">A 6 item long array, in the order front back left right bottom top</param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    static private Mesh CreateCube(int[] t)
-    {
-        if (t.Length != 6)
-        {
-            throw new ArgumentException("Wrong length of textures[]");
-        }
-        Mesh cube = new Mesh(
-            [
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(t[0]/tcf, 1), new Vector2((t[0] + 1)/tcf, 0), new Vector2(t[0]/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(t[0]/tcf, 1), new Vector2((t[0] + 1)/tcf, 1), new Vector2((t[0] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(t[1]/tcf, 1),  new Vector2((t[1] + 1)/tcf, 0), new Vector2((t[1] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(t[1]/tcf, 1), new Vector2(t[1]/tcf, 0), new Vector2((t[1] + 1)/tcf, 0)),
-
-                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(t[2]/tcf, 1), new Vector2(t[2]/tcf, 0), new Vector2((t[2] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(t[2]/tcf, 1), new Vector2((t[2] + 1)/tcf, 0), new Vector2((t[2] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 1), new Vector2((t[3] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 0), new Vector2(t[3]/tcf, 0)),
-
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2((t[4] + 1)/tcf, 1), new Vector2((t[4] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2(t[4]/tcf, 1), new Vector2((t[4] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 0),new Vector2((t[5] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 1), new Vector2(t[5]/tcf, 1))
-            ]);
-        return cube;
-    }
-    static private Mesh CreateBlockArray(int width, int height, int depth)
-    {
-        List<Mesh> chunk = new List<Mesh>();
-        List<Vector3> transforms = new List<Vector3>();
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < depth; j++)
-            {
-                Random rand = new Random();
-                int bHeight = rand.Next(1, 5);
-                int worldHeight = rand.Next(58, 63);
-                for (int k = 0; k < height; k++)
-                {
-                    if (k < bHeight)
-                    {
-                        chunk.Add(bedrock);
-                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
-                    }
-                    else if (k < worldHeight - 5)
-                    {
-                        if (rand.Next(0, 100) == 0)
-                        {
-                            chunk.Add(diamond);
-                        }
-                        else
-                        {
-                            chunk.Add(stoneCube);
-                        }
-                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
-                    }
-                    else if (k < worldHeight)
-                    {
-                        chunk.Add(dirtCube);
-                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
-                    }
-                    else if (k == worldHeight)
-                    {
-                        chunk.Add(grassCube);
-                        transforms.Add(new Vector3(i * 10, k * 10, j * 10));
-                    }
-                }
-            }
-        }
-        return new Mesh(chunk.ToArray(), transforms.ToArray());
-    }
     static void Main(string[] args)
     {
-
         // Mesh world = new Mesh([grassCube, dirtCube, woodCube, stoneCube, bedrock], [new Vector3(0, 0, 0), new Vector3(0, 0, 20), new Vector3(20, 0, 0), new Vector3(20, 0, 20), new Vector3(40, 0, 0)]);
-        Mesh chunks = new Mesh([
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth),
-            CreateBlockArray(chunkWidth, chunkHeight, chunkDepth)
-        ], [
-            new Vector3(0, 0, 0),
-            new Vector3(chunkWidth * 10 * 1, 0, 0),
-            new Vector3(chunkWidth * 10 * 2, 0, 0),
-            new Vector3(0, 0, chunkDepth * 10 * 1),
-            new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 1),
-            new Vector3(chunkWidth * 10 * 2, 0, chunkDepth * 10 * 1),
-            new Vector3(0, 0, chunkDepth * 10 * 2),
-            new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 2),
-            new Vector3(chunkWidth * 10 * 2, 0, chunkDepth * 10 * 2),
-            new Vector3(0, 0, chunkDepth * 10 * 3),
-            new Vector3(chunkWidth * 10 * 1, 0, chunkDepth * 10 * 3),
-            new Vector3(chunkWidth * 10 * 2, 0, chunkDepth * 10 * 3)
-        ]);
+        World world = new World(new Vector2(5, 5));
+
         var game = new FormGame.Game();
-        game.triangleVertices = chunks.GetMeshAsTriangles(new Vector3(0, 0, 0));
+        game.triangleVertices = world.GetMeshAsTriangles(new Vector3(0, 0, 0));
         game.Run();
         game.Dispose();
     }
