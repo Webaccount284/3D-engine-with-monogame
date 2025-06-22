@@ -8,8 +8,9 @@ using System.Linq;
 using Microsoft.Xna.Framework.Audio;
 using System.Net.PeerToPeer;
 using SharpDX.Direct3D11;
-public class Block : Object
+public class Block : ShapeObject
 {
+    // change to only get 3 sides of mesh face to renderer
     public int id;
     public string name;
     public Mesh mesh;
@@ -58,8 +59,8 @@ public class Block : Object
             return mesh.GetMeshAsTriangles(transform);
         }
     }
-}
-public class Chunk : Object
+}   
+public class Chunk : ShapeObject
 {
     public Vector2 position;
     public Block[,,] data;
@@ -143,15 +144,13 @@ public class Chunk : Object
         }
         data = chunk;
     }
-}
-public class World : Object
+}   
+public class World : ShapeObject
 {
     public Chunk[,] chunks;
     public Vector2 size = new Vector2(0, 0);
     public World(Vector2 size)
     {
-
-        // replace fixed 256 values with actual size
         int sizeX = (int)((size.X + 2) * Block.BLOCKSIZE * Chunk.WIDTH);
         int sizeY = (int)((size.X + 2) * Block.BLOCKSIZE * Chunk.DEPTH);
         int[,] worldHeight = new int[sizeX, sizeY];
@@ -205,12 +204,12 @@ public class World : Object
         }
         return mesh.ToArray();
     }
-}
-public abstract class Object
+}   
+public abstract class ShapeObject
 {
     abstract public VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform);
 }
-public class Mesh : Object
+public class Mesh : ShapeObject
 {
     public Triangle3D[] triangles;
     public Mesh(Triangle3D[] triangles)
@@ -244,7 +243,7 @@ public class Mesh : Object
         return textures.ToArray();
     }
 }
-public class Triangle3D : Object
+public class Triangle3D : ShapeObject
 {
     public Vector3 p1 { get; set; }
     public Vector3 p2 { get; set; }
@@ -276,21 +275,14 @@ public class Triangle3D : Object
 }
 class Program
 {
-
-    static int chunkWidth = 16, chunkHeight = 128, chunkDepth = 16;
-    /// <summary>
-    /// Returns a new mesh with cube faces defined by you
-    /// </summary>
-    /// <param name="textures">A 6 item long array, in the order front back left right bottom top</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
     static void Main(string[] args)
     {
-        // Mesh world = new Mesh([grassCube, dirtCube, woodCube, stoneCube, bedrock], [new Vector3(0, 0, 0), new Vector3(0, 0, 20), new Vector3(20, 0, 0), new Vector3(20, 0, 20), new Vector3(40, 0, 0)]);
-        World world = new World(new Vector2(5, 5));
+        World world = new World(new Vector2(2, 2));
 
         var game = new FormGame.Game();
+        
         game.triangleVertices = world.GetMeshAsTriangles(new Vector3(0, 0, 0));
+        
         game.Run();
         game.Dispose();
     }
