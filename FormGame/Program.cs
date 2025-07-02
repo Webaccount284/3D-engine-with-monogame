@@ -16,37 +16,49 @@ public class Block : ShapeObject
     public Mesh mesh;
     static float tcf = 8;
     public const int BLOCKSIZE = 10;
-    public Block(int id, string name, Mesh mesh)
+    public Mesh[] faces = new Mesh[6];
+    public Block(int id, string name, Mesh[] meshFaces)
     {
         this.id = id;
         this.name = name;
-        this.mesh = mesh;
+        this.faces = meshFaces;
     }
 
-    public static Mesh CreateCubeMesh(int[] t)
-    {
+    public static Mesh[] CreateCubeMeshFaces(int[] t)
+    { 
         if (t.Length != 6)
         {
             throw new ArgumentException("Wrong length of textures[]");
         }
-        Mesh cube = new Mesh(
-            [
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(t[0]/tcf, 1), new Vector2((t[0] + 1)/tcf, 0), new Vector2(t[0]/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(t[0]/tcf, 1), new Vector2((t[0] + 1)/tcf, 1), new Vector2((t[0] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0),  new Vector2(t[1]/tcf, 1),  new Vector2((t[1] + 1)/tcf, 0), new Vector2((t[1] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0),  new Vector2(t[1]/tcf, 1), new Vector2(t[1]/tcf, 0), new Vector2((t[1] + 1)/tcf, 0)),
-
-                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(t[2]/tcf, 1), new Vector2(t[2]/tcf, 0), new Vector2((t[2] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(t[2]/tcf, 1), new Vector2((t[2] + 1)/tcf, 0), new Vector2((t[2] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 1), new Vector2((t[3] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 0), new Vector2(t[3]/tcf, 0)),
-
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2((t[4] + 1)/tcf, 1), new Vector2((t[4] + 1)/tcf, 0)),
-                new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2(t[4]/tcf, 1), new Vector2((t[4] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 0),new Vector2((t[5] + 1)/tcf, 1)),
-                new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 1), new Vector2(t[5]/tcf, 1))
-            ]);
-        return cube;
+        Mesh[] faces = [
+            // left and right sides
+                new Mesh([
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(t[0] / tcf, 1), new Vector2((t[0] + 1) / tcf, 0), new Vector2(t[0] / tcf, 0)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(t[0] / tcf, 1), new Vector2((t[0] + 1) / tcf, 1), new Vector2((t[0] + 1) / tcf, 0))
+                    ]),
+                new Mesh([
+                    new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(t[2]/tcf, 1), new Vector2(t[2]/tcf, 0), new Vector2((t[2] + 1)/tcf, 0)),
+                    new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(t[2]/tcf, 1), new Vector2((t[2] + 1)/tcf, 0), new Vector2((t[2] + 1)/tcf, 1))
+                    ]),
+            // back front
+                new Mesh([
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0), new Vector2(t[2]/tcf, 1), new Vector2(t[2]/tcf, 0), new Vector2((t[2] + 1)/tcf, 0)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0), new Vector2(t[2]/tcf, 1), new Vector2((t[2] + 1)/tcf, 0), new Vector2((t[2] + 1)/tcf, 1))
+                    ]),
+                new Mesh([
+                    new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 1), new Vector2((t[3] + 1)/tcf, 0)),
+                    new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(t[3]/tcf, 1), new Vector2((t[3] + 1)/tcf, 0), new Vector2(t[3]/tcf, 0))
+                    ]),
+            // top bottom
+                new Mesh([
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2((t[4] + 1)/tcf, 1), new Vector2((t[4] + 1)/tcf, 0)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4]/tcf, 0), new Vector2(t[4]/tcf, 1), new Vector2((t[4] + 1)/tcf, 1))
+                    ]),
+                new Mesh([
+                    new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 0),new Vector2((t[5] + 1)/tcf, 1)),
+                    new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(t[5]/tcf, 0), new Vector2((t[5] + 1)/tcf, 1), new Vector2(t[5]/tcf, 1))
+                    ])];
+        return faces;
     }
     public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
     {
@@ -56,7 +68,7 @@ public class Block : ShapeObject
         }
         else
         {
-            return mesh.GetMeshAsTriangles(transform);
+            return new Mesh([faces[0], faces[1], faces[2], faces[3], faces[4], faces[5]], [new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0)]).GetMeshAsTriangles(transform);// repeat for all 6 faces
         }
     }
 }   
@@ -66,14 +78,14 @@ public class Chunk : ShapeObject
     public Block[,,] data;
     public const int WIDTH = 16, DEPTH = 16, HEIGHT = 256;
 
-    static Block air = new Block(-1, "Air Block", Block.CreateCubeMesh([0, 0, 0, 0, 0, 0]));
-    static Block grassBlock = new Block(0, "Grass Block", Block.CreateCubeMesh([0, 0, 0, 0, 1, 2]));
-    static Block dirtBlock = new Block(1, "Dirt Block", Block.CreateCubeMesh([1, 1, 1, 1, 1, 1]));
-    static Block stoneBlock = new Block(2, "Stone Block", Block.CreateCubeMesh([3, 3, 3, 3, 3, 3]));
-    static Block woodPlank = new Block(3, "Wood Planks", Block.CreateCubeMesh([4, 4, 4, 4, 4, 4]));
-    static Block diamondOre = new Block(4, "Diamond Ore", Block.CreateCubeMesh([6, 6, 6, 6, 6, 6]));
-    static Block bedrock = new Block(5, "Bedrock", Block.CreateCubeMesh([5, 5, 5, 5, 5, 5]));
-    static Block leaves = new Block(6, "Leaves", Block.CreateCubeMesh([7, 7, 7, 7, 7, 7]));
+    static Block air = new Block(-1, "Air Block", Block.CreateCubeMeshFaces([0, 0, 0, 0, 0, 0]));
+    static Block grassBlock = new Block(0, "Grass Block", Block.CreateCubeMeshFaces([0, 0, 0, 0, 1, 2]));
+    static Block dirtBlock = new Block(1, "Dirt Block", Block.CreateCubeMeshFaces([1, 1, 1, 1, 1, 1]));
+    static Block stoneBlock = new Block(2, "Stone Block", Block.CreateCubeMeshFaces([3, 3, 3, 3, 3, 3]));
+    static Block woodPlank = new Block(3, "Wood Planks", Block.CreateCubeMeshFaces([4, 4, 4, 4, 4, 4]));
+    static Block diamondOre = new Block(4, "Diamond Ore", Block.CreateCubeMeshFaces([6, 6, 6, 6, 6, 6]));
+    static Block bedrock = new Block(5, "Bedrock", Block.CreateCubeMeshFaces([5, 5, 5, 5, 5, 5]));
+    static Block leaves = new Block(6, "Leaves", Block.CreateCubeMeshFaces([7, 7, 7, 7, 7, 7]));
     public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
     {
         List<VertexPositionTexture> mesh = new List<VertexPositionTexture>();
@@ -83,7 +95,75 @@ public class Chunk : ShapeObject
             {
                 for (int k = 0; k < HEIGHT; k++)
                 {
-                    mesh.AddRange(data[i, j, k].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                    if (data[i, j, k].id != -1)
+                    {
+                        if (k < HEIGHT - 1)
+                        {
+                            if (data[i, j, k + 1].id == -1)
+                            {
+                                mesh.AddRange(data[i, j, k].faces[5].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                            }
+                        }
+                        else
+                        {
+                            mesh.AddRange(data[i, j, k].faces[5].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                        }
+                        if (k > 0)
+                        {
+                            if (data[i, j, k - 1].id == -1)
+                            {
+                                mesh.AddRange(data[i, j, k].faces[4].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                            }
+                        }
+                        else
+                        {
+                            mesh.AddRange(data[i, j, k].faces[4].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                        }
+                        if (i < WIDTH - 1)
+                        {
+                            if (data[i + 1, j, k].id == -1)
+                            {
+                                mesh.AddRange(data[i, j, k].faces[0].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                            }
+                        }
+                        else
+                        {
+                            mesh.AddRange(data[i, j, k].faces[0].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                        }
+                        if (i > 0)
+                        {
+                            if (data[i - 1, j, k].id == -1)
+                            {
+                                mesh.AddRange(data[i, j, k].faces[1].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                            }
+                        }
+                        else
+                        {
+                            mesh.AddRange(data[i, j, k].faces[1].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                        }
+                        if (j < DEPTH - 1)
+                        {
+                            if (data[i, j + 1, k].id == -1)
+                            {
+                                mesh.AddRange(data[i, j, k].faces[3].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                            }
+                        }
+                        else
+                        {
+                            mesh.AddRange(data[i, j, k].faces[3].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                        }
+                        if (j > 0)
+                        {
+                            if (data[i, j - 1, k].id == -1)
+                            {
+                                mesh.AddRange(data[i, j, k].faces[2].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                            }
+                        }
+                        else
+                        {
+                            mesh.AddRange(data[i, j, k].faces[2].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
+                        }
+                    }
                 }
             }
         }
@@ -282,7 +362,6 @@ class Program
         var game = new FormGame.Game();
         
         game.triangleVertices = world.GetMeshAsTriangles(new Vector3(0, 0, 0));
-        
         game.Run();
         game.Dispose();
     }
