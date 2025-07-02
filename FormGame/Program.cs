@@ -152,7 +152,7 @@ public class Chunk : ShapeObject
                         {
                             mesh.AddRange(data[i, j, k].faces[3].GetMeshAsTriangles(transform + new Vector3(Block.BLOCKSIZE * i, Block.BLOCKSIZE * k, Block.BLOCKSIZE * j)));
                         }
-                        if (j > 0)
+                        sif (j > 0)
                         {
                             if (data[i, j - 1, k].id == -1)
                             {
