@@ -229,6 +229,7 @@ public class World : ShapeObject
 {
     public Chunk[,] chunks;
     public Vector2 size = new Vector2(0, 0);
+    int[,] worldHeight;
     public World(Vector2 size)
     {
         int sizeX = (int)((size.X + 2) * Block.BLOCKSIZE * Chunk.WIDTH);
@@ -259,18 +260,35 @@ public class World : ShapeObject
                     worldHeight[x, y] = worldHeight2[x, y];
                 }
             }
-
         }
+        this.worldHeight = worldHeight;
         this.size = size;
         chunks = new Chunk[(int)size.X, (int)size.Y];
-        for (int i = 0; i < size.X; i++)
+        /*for (int i = 0; i < size.X; i++)
         {
             for (int j = 0; j < size.Y; j++)
             {
                 chunks[i, j] = new Chunk();
                 chunks[i, j].CreateBlockArray(worldHeight, new Vector2(i + 1, j + 1));
             }
+        }*/
+    }
+    public VertexPositionTexture[] GetChunkMesh(Vector2 chunk, Vector3 transform)
+    {
+        if (chunk.X < 0 || chunk.X > size.X)
+        {
+            throw new Exception("World size too small");
         }
+        if (chunk.Y < 0 || chunk.Y > size.Y)
+        {
+            throw new Exception("World size too small");
+        }
+        if (chunks[(int) chunk.X, (int) chunk.Y] == null)
+        {
+            chunks[(int)chunk.X, (int)chunk.Y] = new Chunk();
+            chunks[(int)chunk.X, (int)chunk.Y].CreateBlockArray(worldHeight, chunk + new Vector2(2, 2));
+        }
+        return chunks[(int)chunk.X, (int)chunk.Y].GetMeshAsTriangles(new Vector3(transform.X + chunk.X * Chunk.WIDTH * Block.BLOCKSIZE, transform.Y, transform.Z + chunk.Y * Chunk.DEPTH * Block.BLOCKSIZE));
     }
     public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
     {

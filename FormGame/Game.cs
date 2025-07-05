@@ -27,7 +27,7 @@ namespace FormGame
         BasicEffect basicEffect;
 
         // World
-        World world = new World(new Vector2(2, 2));
+        World world = new World(new Vector2(8, 8));
 
         //Geometric info
         public VertexPositionTexture[] triangleVertices;
@@ -65,8 +65,8 @@ namespace FormGame
             basicEffect.LightingEnabled = false;
 
             // World
-            triangleVertices = world.GetMeshAsTriangles(new Vector3(0, 0, 0));
-
+            // triangleVertices = world.GetMeshAsTriangles(new Vector3(0, 0, 0));
+            triangleVertices = world.GetChunkMesh(new Vector2(0, 0), new Vector3(0, 0, 0)).Concat<VertexPositionTexture>(world.GetChunkMesh(new Vector2(1, 0), new Vector3(0, 0, 0))).ToArray<VertexPositionTexture>();
             // triangleVertices = LoadBlocks();
             triangleCount = triangleVertices.Length / 3;
             vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), triangleCount * 3, BufferUsage.WriteOnly);
