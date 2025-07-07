@@ -38,6 +38,7 @@ namespace FormGame
         List<VertexPositionTexture> chunkMeshes = new List<VertexPositionTexture>();
         bool reloadChunkMesh = true;
         Vector2 chunkLoc;
+        int chunkRenderDistance = 2; // creates a square around player. A render distance of 2 means that a 3x3 grid of chunks is rendered. 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -173,11 +174,25 @@ namespace FormGame
 
             Vector2[] chunks = CalculateLoadedChunks();
             
-            reloadChunkMesh = true;
-            
+            if (loadedChunks.Count == chunks.Length)
+            {
+                for (int i = 0; i < chunks.Length - 1; i++)
+                {
+                    if (loadedChunks[i].X != chunks[i].X || loadedChunks[i].Y != chunks[i].Y)
+                    {
+                        reloadChunkMesh = true;
+                        i = chunks.Length;
+                    }
+                }
+            }
+            else
+            {
+                reloadChunkMesh = true;
+            }
             if (reloadChunkMesh == true)
             {
                 reloadChunkMesh = false;
+                loadedChunks = chunks.ToList<Vector2>();
                 chunkMeshes.Clear();
                 for (int i = 0; i < chunks.Length; i++)
                 {
@@ -196,9 +211,20 @@ namespace FormGame
             chunkLoc = new Vector2(camPosition.X, camPosition.Z);
             chunkLoc.X /= Block.BLOCKSIZE * Chunk.WIDTH;
             chunkLoc.Y /= Block.BLOCKSIZE * Chunk.DEPTH;
-            chunkLoc = new Vector2((int)chunkLoc.X, (int)chunkLoc.Y);
+            chunkLoc.Floor();
             List<Vector2> chunks = new List<Vector2>();
-            chunks.Add(chunkLoc);
+            // chunks.Add(chunkLoc);
+            for (int i = -1 - chunkRenderDistance; i < chunkRenderDistance; i++)
+            {
+                for (int j = -1 - chunkRenderDistance; j < chunkRenderDistance; j++)
+                {
+                    Vector2 delta = chunkLoc + new Vector2(i, j);
+                    if (delta.X > 0 && delta.Y > 0 && delta.X < world.size.X && delta.Y < world.size.Y)
+                    {
+                        chunks.Add(delta);
+                    }
+                }
+            }
             return chunks.ToArray();
             
         }
