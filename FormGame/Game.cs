@@ -27,7 +27,7 @@ namespace FormGame
         BasicEffect basicEffect;
 
         // World
-        World world = new World(new Vector2(8, 8));
+        World world = new World(new Vector2(32, 32));
 
         //Geometric info
         public VertexPositionTexture[] triangleVertices;
@@ -38,7 +38,7 @@ namespace FormGame
         List<VertexPositionTexture> chunkMeshes = new List<VertexPositionTexture>();
         bool reloadChunkMesh = true;
         Vector2 chunkLoc;
-        int chunkRenderDistance = 2; // creates a square around player. A render distance of 2 means that a 3x3 grid of chunks is rendered. 
+        int chunkRenderDistance = 4; // creates a square around player. A render distance of 2 means that a 3x3 grid of chunks is rendered. 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);

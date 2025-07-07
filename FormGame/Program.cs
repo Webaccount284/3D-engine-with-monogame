@@ -16,10 +16,9 @@ class Program
     {
         // TODO
         /*
-         * add world class getting the mesh of one chunk
-         * change instantiation of world class to not generate all the chunks, only the map for the chunks
          * improve world generation
-         * 
+         * add collision 
+         * add more blocks
         */
         var game = new FormGame.Game();
         game.Run();

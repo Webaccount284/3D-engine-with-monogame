@@ -14,7 +14,7 @@ public class Block : ShapeObject
     public int id;
     public string name;
     public Mesh mesh;
-    static float tcf = 8;
+    static float tcf = 9; // textures across faces
     public const int BLOCKSIZE = 10;
     public Mesh[] faces = new Mesh[6];
     public Block(int id, string name, Mesh[] meshFaces)
