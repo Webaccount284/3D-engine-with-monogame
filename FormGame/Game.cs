@@ -32,10 +32,12 @@ namespace FormGame
         //Geometric info
         public VertexPositionTexture[] triangleVertices;
         Microsoft.Xna.Framework.Graphics.VertexBuffer vertexBuffer;
-        int triangleCount;
+        int triangleCount = 1;
         Texture2D tileSheet;
-
-        //Map info
+        List<Vector2> loadedChunks = new List<Vector2>();
+        List<VertexPositionTexture> chunkMeshes = new List<VertexPositionTexture>();
+        bool reloadChunkMesh = true;
+        Vector2 chunkLoc;
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -47,12 +49,12 @@ namespace FormGame
             base.Initialize();
 
             // Setup Camera
-            camAngle = new Microsoft.Xna.Framework.Vector2(0f, 0f); // angles of the camera
-            camTarget = new Microsoft.Xna.Framework.Vector3(0f, 0f, 0f); // targeted point
-            camPosition = new Microsoft.Xna.Framework.Vector3(0f, 0f, -100f);
+            camAngle = new Vector2(0f, 0f); // angles of the camera
+            camTarget = new Vector3(1f, 100f, 1f); // targeted point
+            camPosition = new Vector3(100f, 1000f, 100f);
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(80f), GraphicsDevice.DisplayMode.AspectRatio, 1f, 4000f);
-            viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, new Microsoft.Xna.Framework.Vector3(0f, 1f, 0f));// Y up
-            worldMatrix = Matrix.CreateWorld(camTarget, Microsoft.Xna.Framework.Vector3.Forward, Microsoft.Xna.Framework.Vector3.Up);
+            viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, Vector3.Up); 
+            worldMatrix = Matrix.CreateWorld(camTarget, Vector3.Forward, Vector3.Up);
 
             
             // BasicEffect
@@ -65,12 +67,13 @@ namespace FormGame
             basicEffect.LightingEnabled = false;
 
             // World
-            // triangleVertices = world.GetMeshAsTriangles(new Vector3(0, 0, 0));
-            triangleVertices = world.GetChunkMesh(new Vector2(0, 0), new Vector3(0, 0, 0)).Concat<VertexPositionTexture>(world.GetChunkMesh(new Vector2(1, 0), new Vector3(0, 0, 0))).ToArray<VertexPositionTexture>();
+            chunkMeshes.AddRange(world.GetChunkMesh(new Vector2(0, 0), new Vector3(0, 0, 0)));
+            chunkMeshes.AddRange(world.GetChunkMesh(new Vector2(1, 0), new Vector3(0, 0, 0)));
+            loadedChunks.Add(new Vector2(0, 0)); 
+            loadedChunks.Add(new Vector2(1, 0));
             // triangleVertices = LoadBlocks();
-            triangleCount = triangleVertices.Length / 3;
             vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), triangleCount * 3, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionTexture>(triangleVertices);
+            // vertexBuffer.SetData<VertexPositionTexture>(triangleVertices);
         }
         protected override void LoadContent()
         {
@@ -162,11 +165,43 @@ namespace FormGame
                     camAngle.Y = -90;
                 }
             }
-            camTarget = new Microsoft.Xna.Framework.Vector3((float)(camPosition.X + Math.Sin(camAngle.X * (Math.PI / 180))), (float)(camPosition.Y + Math.Sin(camAngle.Y * (Math.PI / 180))), (float)(camPosition.Z + Math.Cos(camAngle.X * (Math.PI / 180))));
-            viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, Microsoft.Xna.Framework.Vector3.Up);
+            camTarget = new Vector3((float)(camPosition.X + Math.Sin(camAngle.X * (Math.PI / 180))), (float)(camPosition.Y + Math.Sin(camAngle.Y * (Math.PI / 180))), (float)(camPosition.Z + Math.Cos(camAngle.X * (Math.PI / 180))));
+            viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, Vector3.Up);
+
+            triangleVertices = chunkMeshes.ToArray();
+            triangleCount = chunkMeshes.Count / 3;
+
+            Vector2[] chunks = CalculateLoadedChunks();
+            
+            reloadChunkMesh = true;
+            
+            if (reloadChunkMesh == true)
+            {
+                reloadChunkMesh = false;
+                chunkMeshes.Clear();
+                for (int i = 0; i < chunks.Length; i++)
+                {
+                    chunkMeshes.AddRange(world.GetChunkMesh(chunks[i], new Vector3(0, 0, 0)));
+                }
+                triangleVertices = chunkMeshes.ToArray();
+                triangleCount = chunkMeshes.Count / 3;
+                vertexBuffer.Dispose();
+                vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), triangleCount * 3, BufferUsage.WriteOnly);
+                vertexBuffer.SetData<VertexPositionTexture>(triangleVertices);
+            }
             base.Update(gameTime);
         }
-
+        private Vector2[] CalculateLoadedChunks()
+        {
+            chunkLoc = new Vector2(camPosition.X, camPosition.Z);
+            chunkLoc.X /= Block.BLOCKSIZE * Chunk.WIDTH;
+            chunkLoc.Y /= Block.BLOCKSIZE * Chunk.DEPTH;
+            chunkLoc = new Vector2((int)chunkLoc.X, (int)chunkLoc.Y);
+            List<Vector2> chunks = new List<Vector2>();
+            chunks.Add(chunkLoc);
+            return chunks.ToArray();
+            
+        }
         protected override void Draw(GameTime gameTime)
         {
             basicEffect.Projection = projectionMatrix;
@@ -187,7 +222,6 @@ namespace FormGame
                 pass.Apply();
                 GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, triangleCount * 3);
             }
-
             base.Draw(gameTime);
         }
     }
