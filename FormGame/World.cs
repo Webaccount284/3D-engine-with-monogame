@@ -15,7 +15,7 @@ public class Block : ShapeObject
     public string name;
     public Mesh mesh;
     static float tcfWidth = 16; // textures across faces width
-    static float tcfHeight = 256; // textures across faces height
+    static float tcfHeight = 16; // textures across faces height
     public const int BLOCKSIZE = 10;
     public Mesh[] faces = new Mesh[6];
     public Block(int id, string name, Mesh[] meshFaces)
@@ -32,32 +32,32 @@ public class Block : ShapeObject
             throw new ArgumentException("Wrong length of textures[]");
         }
         Mesh[] faces = [
-            // left and right sides
+            // left and right sides (North & South compared to top texture)
                 new Mesh([
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2(t[0].X / tcfWidth, t[0].Y / tcfHeight + 1), new Vector2((t[0].X + 1) / tcfWidth, t[0].Y / tcfHeight), new Vector2(t[0].X / tcfWidth, t[0].Y / tcfHeight)),
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2(t[0].X / tcfWidth, t[0].Y / tcfHeight + 1), new Vector2((t[0].X + 1) / tcfWidth, t[0].Y / tcfHeight + 1), new Vector2((t[0].X + 1) / tcfWidth, t[0].Y / tcfHeight))
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 10), new Vector3(0, 10, 0), new Vector2((t[0].X + 1) / tcfWidth, (t[0].Y + 1) / tcfHeight), new Vector2((t[0].X + 0) / tcfWidth, t[0].Y / tcfHeight), new Vector2((t[0].X + 1) / tcfWidth, t[0].Y / tcfHeight)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 10, 10), new Vector2((t[0].X + 1) / tcfWidth, (t[0].Y + 1) / tcfHeight), new Vector2((t[0].X + 0) / tcfWidth, (t[0].Y + 1) / tcfHeight), new Vector2((t[0].X + 0) / tcfWidth, t[0].Y / tcfHeight))
                     ]),
                 new Mesh([
-                    new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(t[1].X/tcfWidth, t[1].Y / tcfHeight + 1), new Vector2(t[1].X/tcfWidth, t[1].Y / tcfHeight), new Vector2((t[1].X + 1)/tcfWidth, t[1].Y / tcfHeight)),
-                    new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(t[1].X/tcfWidth, t[1].Y / tcfHeight + 1), new Vector2((t[1].X + 1)/tcfWidth, t[1].Y / tcfHeight), new Vector2((t[1].X + 1)/tcfWidth, t[1].Y / tcfHeight + 1))
+                    new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 10, 10), new Vector2(t[1].X/tcfWidth, (t[1].Y + 1) / tcfHeight), new Vector2(t[1].X/tcfWidth, t[1].Y / tcfHeight), new Vector2((t[1].X + 1)/tcfWidth, t[1].Y / tcfHeight)),
+                    new Triangle3D(new Vector3(-10, 0, 0), new Vector3(-10, 10, 10), new Vector3(-10, 0, 10), new Vector2(t[1].X/tcfWidth, (t[1].Y + 1) / tcfHeight), new Vector2((t[1].X + 1)/tcfWidth, t[1].Y / tcfHeight), new Vector2((t[1].X + 1)/tcfWidth,(t[1].Y + 1) / tcfHeight))
                     ]),
-            // back front
+            // back front (West & East compared to top texture)
                 new Mesh([
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0), new Vector2(t[2].X/tcfWidth, t[2].Y / tcfHeight + 1), new Vector2(t[2].X/tcfWidth, t[2].Y / tcfHeight), new Vector2((t[2].X + 1)/tcfWidth, t[2].Y / tcfHeight)),
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0), new Vector2(t[2].X/tcfWidth, t[2].Y / tcfHeight + 1), new Vector2((t[2].X + 1)/tcfWidth, t[2].Y / tcfHeight), new Vector2((t[2].X + 1)/tcfWidth, t[2].Y / tcfHeight + 1))
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(-10, 10, 0), new Vector2(t[2].X/tcfWidth, (t[2].Y + 1) / tcfHeight), new Vector2(t[2].X/tcfWidth, t[2].Y / tcfHeight), new Vector2((t[2].X + 1) / tcfWidth, t[2].Y / tcfHeight)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 10, 0), new Vector3(-10, 0, 0), new Vector2(t[2].X/tcfWidth, (t[2].Y + 1) / tcfHeight), new Vector2((t[2].X + 1)/tcfWidth, t[2].Y / tcfHeight), new Vector2((t[2].X + 1)/tcfWidth, (t[3].Y + 1) / tcfHeight))
                     ]),
                 new Mesh([
-                    new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2(t[3].X/tcfWidth, t[3].Y / tcfHeight + 1), new Vector2((t[3].X + 1)/tcfWidth, t[3].Y / tcfHeight + 1), new Vector2((t[3].X + 1)/tcfWidth, t[3].Y / tcfHeight)),
-                    new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2(t[3].X/tcfWidth, t[3].Y / tcfHeight + 1), new Vector2((t[3].X + 1)/tcfWidth, t[3].Y / tcfHeight), new Vector2(t[3].X/tcfWidth, t[3].Y / tcfHeight))
+                    new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2((t[3].X + 1)/tcfWidth, (t[3].Y + 1) / tcfHeight), new Vector2((t[3].X + 0)/tcfWidth,  (t[3].Y + 1) / tcfHeight), new Vector2((t[3].X + 0)/tcfWidth, t[3].Y / tcfHeight)),
+                    new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2((t[3].X + 1)/tcfWidth, (t[3].Y + 1) / tcfHeight), new Vector2((t[3].X + 0)/tcfWidth, t[3].Y / tcfHeight), new Vector2((t[3].X + 1)/tcfWidth, t[3].Y / tcfHeight))
                     ]),
             // top bottom
                 new Mesh([
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight + 1), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight)),
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight + 1), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight + 1))
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth,  (t[4].Y + 1) / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight), new Vector2(t[4].X/tcfWidth, (t[4].Y + 1) / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth, (t[4].Y + 1) / tcfHeight))
                     ]),
                 new Mesh([
-                    new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5].X/tcfWidth, t[5].Y / tcfHeight), new Vector2((t[5].X + 1)/tcfWidth, t[5].Y / tcfHeight),new Vector2((t[5].X + 1)/tcfWidth, t[5].Y / tcfHeight + 1)),
-                    new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(t[5].X/tcfWidth, t[5].Y / tcfHeight), new Vector2((t[5].X + 1)/tcfWidth, t[5].Y / tcfHeight + 1), new Vector2(t[5].X/tcfWidth, t[5].Y / tcfHeight + 1))
+                    new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5].X/tcfWidth, t[5].Y / tcfHeight), new Vector2((t[5].X + 1)/tcfWidth, t[5].Y / tcfHeight),new Vector2((t[5].X + 1)/tcfWidth, (t[5].Y + 1) / tcfHeight)),
+                    new Triangle3D(new Vector3(0, 10, 0), new Vector3(-10, 10, 10), new Vector3(-10, 10, 0), new Vector2(t[5].X/tcfWidth, t[5].Y / tcfHeight), new Vector2((t[5].X + 1)/tcfWidth, (t[5].Y + 1) / tcfHeight), new Vector2(t[5].X/tcfWidth, (t[5].Y + 1) / tcfHeight))
                     ])];
         return faces;
     }
