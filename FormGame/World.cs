@@ -50,10 +50,10 @@ public class Block : ShapeObject
                     new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 0, 10), new Vector3(-10, 10, 10), new Vector2((t[3].X + 1)/tcfWidth, (t[3].Y + 1) / tcfHeight), new Vector2((t[3].X + 0)/tcfWidth,  (t[3].Y + 1) / tcfHeight), new Vector2((t[3].X + 0)/tcfWidth, t[3].Y / tcfHeight)),
                     new Triangle3D(new Vector3(0, 0, 10), new Vector3(-10, 10, 10), new Vector3(0, 10, 10), new Vector2((t[3].X + 1)/tcfWidth, (t[3].Y + 1) / tcfHeight), new Vector2((t[3].X + 0)/tcfWidth, t[3].Y / tcfHeight), new Vector2((t[3].X + 1)/tcfWidth, t[3].Y / tcfHeight))
                     ]),
-            // top bottom
+            // bottom, top
                 new Mesh([
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth,  (t[4].Y + 1) / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight)),
-                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2(t[4].X/tcfWidth, t[4].Y / tcfHeight), new Vector2(t[4].X/tcfWidth, (t[4].Y + 1) / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth, (t[4].Y + 1) / tcfHeight))
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 10), new Vector3(0, 0, 10), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight), new Vector2((t[4].X + 0)/tcfWidth,  (t[4].Y + 1) / tcfHeight), new Vector2((t[4].X + 0)/tcfWidth, t[4].Y / tcfHeight)),
+                    new Triangle3D(new Vector3(0, 0, 0), new Vector3(-10, 0, 0), new Vector3(-10, 0, 10), new Vector2((t[4].X + 1)/tcfWidth, t[4].Y / tcfHeight), new Vector2((t[4].X + 1)/tcfWidth, (t[4].Y + 1) / tcfHeight), new Vector2((t[4].X + 0)/tcfWidth, (t[4].Y + 1) / tcfHeight))
                     ]),
                 new Mesh([
                     new Triangle3D(new Vector3(0, 10, 0), new Vector3(0, 10, 10), new Vector3(-10, 10, 10), new Vector2(t[5].X/tcfWidth, t[5].Y / tcfHeight), new Vector2((t[5].X + 1)/tcfWidth, t[5].Y / tcfHeight),new Vector2((t[5].X + 1)/tcfWidth, (t[5].Y + 1) / tcfHeight)),
