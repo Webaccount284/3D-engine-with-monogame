@@ -18,8 +18,9 @@ public class Block : ShapeObject
     static float tcfHeight = 16; // textures across faces height
     public const int BLOCKSIZE = 10;
     public Mesh[] faces = new Mesh[6];
-    public Block(int id, string name, Mesh[] meshFaces)
+    public Block(int id, string name, Mesh[] meshFaces, Vector3 transparentDir)
     {
+        // transparentDir means what directions it is transparent in. 0 is no, 1 is yes on that axis, 2 is yes but only in the positive direction, and 3 is yes but only is the negative direction)
         this.id = id;
         this.name = name;
         this.faces = meshFaces;
@@ -79,14 +80,14 @@ public class Chunk : ShapeObject
     public Block[,,] data;
     public const int WIDTH = 16, DEPTH = 16, HEIGHT = 256;
 
-    static Block air = new Block(-1, "Air Block", Block.CreateCubeMeshFaces([new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0)]));
-    static Block grassBlock = new Block(0, "Grass Block", Block.CreateCubeMeshFaces([new Vector2(3, 0), new Vector2(3, 0), new Vector2(3, 0), new Vector2(3, 0), new Vector2(2, 0), new Vector2(0, 0)]));
-    static Block dirtBlock = new Block(1, "Dirt Block", Block.CreateCubeMeshFaces([new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0)]));
-    static Block stoneBlock = new Block(2, "Stone Block", Block.CreateCubeMeshFaces([new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0)]));
-    static Block woodPlank = new Block(3, "Wood Planks", Block.CreateCubeMeshFaces([new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0)]));
-    static Block diamondOre = new Block(4, "Diamond Ore", Block.CreateCubeMeshFaces([new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3)]));
-    static Block bedrock = new Block(5, "Bedrock", Block.CreateCubeMeshFaces([new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1)]));
-    static Block leaves = new Block(6, "Leaves", Block.CreateCubeMeshFaces([new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3)]));
+    static Block air = new Block(-1, "Air Block", Block.CreateCubeMeshFaces([new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0)]), new Vector3(1, 1, 1));
+    static Block grassBlock = new Block(2, "Grass Block", Block.CreateCubeMeshFaces([new Vector2(3, 0), new Vector2(3, 0), new Vector2(3, 0), new Vector2(3, 0), new Vector2(2, 0), new Vector2(0, 0)]), new Vector3(0, 0, 0));
+    static Block dirtBlock = new Block(3, "Dirt Block", Block.CreateCubeMeshFaces([new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0), new Vector2(2, 0)]), new Vector3(0, 0, 0));
+    static Block stoneBlock = new Block(1, "Stone Block", Block.CreateCubeMeshFaces([new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0), new Vector2(1, 0)]), new Vector3(0, 0, 0));
+    static Block woodPlank = new Block(5, "Wood Planks", Block.CreateCubeMeshFaces([new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0), new Vector2(4, 0)]), new Vector3(0, 0, 0));
+    static Block diamondOre = new Block(56, "Diamond Ore", Block.CreateCubeMeshFaces([new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3)]), new Vector3(0, 0, 0));
+    static Block bedrock = new Block(7, "Bedrock", Block.CreateCubeMeshFaces([new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1)]), new Vector3(0, 0, 0));
+    static Block leaves = new Block(18, "Leaves", Block.CreateCubeMeshFaces([new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3)]), new Vector3(0, 0, 0));
     public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
     {
         List<VertexPositionTexture> mesh = new List<VertexPositionTexture>();
