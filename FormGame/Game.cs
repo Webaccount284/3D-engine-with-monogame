@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SharpDX.Direct2D1;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -39,7 +39,7 @@ namespace FormGame
         List<VertexPositionTexture> chunkMeshes = new List<VertexPositionTexture>();
         bool reloadChunkMesh = true;
         Vector2 chunkLoc;
-        int chunkRenderDistance = 4; // creates a square around player. A render distance of 2 means that a 3x3 grid of chunks is rendered. A render distance of 4 means 7x7 grid of chunks is rendered. (renderdist * 2) - 1
+        int chunkRenderDistance = 2; // creates a square around player. A render distance of 2 means that a 3x3 grid of chunks is rendered. A render distance of 4 means 7x7 grid of chunks is rendered. (renderdist * 2) - 1
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -168,7 +168,7 @@ namespace FormGame
                     camAngle.Y = -90;
                 }
             }
-            Console.WriteLine("Uh yea it is " + camPosition.X);
+            // Console.WriteLine("Uh yea it is " + camPosition.X);
             if (camPosition.X < 0 && prevCamPos.X >= 0)
             {
                 camPosition = prevCamPos;

@@ -3,11 +3,10 @@ using System.Drawing.Text;
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using SharpDX.Direct3D9;
+
 using System.Linq;
 using Microsoft.Xna.Framework.Audio;
 using System.Net.PeerToPeer;
-using SharpDX.Direct3D11;
 public class Block : ShapeObject
 {
     // change to only get 3 sides of mesh face to renderer
