@@ -88,6 +88,8 @@ public class Chunk : ShapeObject
     static Block diamondOre = new Block(56, "Diamond Ore", Block.CreateCubeMeshFaces([new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3), new Vector2(2, 3)]), new Vector3(0, 0, 0));
     static Block bedrock = new Block(7, "Bedrock", Block.CreateCubeMeshFaces([new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1), new Vector2(1, 1)]), new Vector3(0, 0, 0));
     static Block leaves = new Block(18, "Leaves", Block.CreateCubeMeshFaces([new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3), new Vector2(5, 3)]), new Vector3(0, 0, 0));
+    static Block woodLog = new Block(17, "Wood Log", Block.CreateCubeMeshFaces([new Vector2(4, 1), new Vector2(4, 1), new Vector2(4, 1), new Vector2(4, 1), new Vector2(5, 1), new Vector2(5, 1)]), new Vector3(0, 0, 0));
+
     public override VertexPositionTexture[] GetMeshAsTriangles(Vector3 transform)
     {
         List<VertexPositionTexture> mesh = new List<VertexPositionTexture>();
@@ -210,7 +212,7 @@ public class Chunk : ShapeObject
                     {
                         if (rand.Next(0, 100) == 5)
                         {
-                            chunk[i, j, k] = leaves;
+                            chunk[i, j, k] = woodLog;
                         }
                         else
                         {
