@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct2D1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -88,6 +89,7 @@ namespace FormGame
 
         protected override void Update(GameTime gameTime)
         {
+            Vector3 prevCamPos = camPosition;
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit(); }
             float s = 1f;
             if (Keyboard.GetState().IsKeyDown(Keys.D))
@@ -165,6 +167,11 @@ namespace FormGame
                 {
                     camAngle.Y = -90;
                 }
+            }
+            Console.WriteLine("Uh yea it is " + camPosition.X);
+            if (camPosition.X < 0 && prevCamPos.X >= 0)
+            {
+                camPosition = prevCamPos;
             }
             camTarget = new Vector3((float)(camPosition.X + Math.Sin(camAngle.X * (Math.PI / 180))), (float)(camPosition.Y + Math.Sin(camAngle.Y * (Math.PI / 180))), (float)(camPosition.Z + Math.Cos(camAngle.X * (Math.PI / 180))));
             viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, Vector3.Up);
