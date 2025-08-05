@@ -52,8 +52,9 @@ namespace FormGame
         BasicEffect basicEffect;
 
         // World
-        World world = new World(new Vector2(6, 6));
+        World world = new World(new Vector2(32, 32));
         List<RenderData> renderData = new List<RenderData>();
+        List<Vector3> loadedChunks = new List<Vector3>(); // these are vector3, not vector2. Vec3 have a y axis component which is obsolete. Can convert to Vec2 if needed
 
         //Geometric info
         public VertexPositionTexture[] triangleVertices;
@@ -63,7 +64,7 @@ namespace FormGame
 
         bool reloadChunkMesh = true;
         Vector2 chunkLoc;
-        int chunkRenderDistance = 2; // creates a square around player. A render distance of 2 means that a 3x3 grid of chunks is rendered. A render distance of 4 means 7x7 grid of chunks is rendered. (renderdist * 2) - 1
+        int chunkRenderDistance = 5; 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -92,6 +93,7 @@ namespace FormGame
             basicEffect.LightingEnabled = false;
 
             // World
+            loadedChunks.Add(new Vector3(0, 0, 0));
             RenderData chunk = new RenderData("Chunk", new Vector3(0, 0, 0) /*the chunk position*/, world.GetChunkMesh(new Vector2(0, 0), new Vector3(0, 0, 0)));
             renderData.Add(chunk);
             vertexBuffer = new Microsoft.Xna.Framework.Graphics.VertexBuffer(GraphicsDevice, typeof(VertexPositionTexture), (int)triangleCount * 3, BufferUsage.WriteOnly);
@@ -195,8 +197,54 @@ namespace FormGame
             }
             camTarget = new Vector3((float)(camPosition.X + Math.Sin(camAngle.X * (Math.PI / 180))), (float)(camPosition.Y + Math.Sin(camAngle.Y * (Math.PI / 180))), (float)(camPosition.Z + Math.Cos(camAngle.X * (Math.PI / 180))));
             viewMatrix = Matrix.CreateLookAt(camPosition, camTarget, Vector3.Up);
+            
+            // chunk management 
+            int chunkHash = GetListHashCode(loadedChunks); // uses hash code to compare lists
+            Vector3 chunkPosition = new Vector3((float)Math.Floor(camPosition.X / (Block.BLOCKSIZE * Chunk.WIDTH)), 0, (float)Math.Floor(camPosition.Z / (Block.BLOCKSIZE * Chunk.DEPTH)));
+            loadedChunks.Clear();
+            for (int i = -chunkRenderDistance; i < chunkRenderDistance; i++)
+            {
+                for (int j = -chunkRenderDistance; j < chunkRenderDistance; j++)
+                {
+                    if (Math.Sqrt(i*i + j*j) < chunkRenderDistance * 2) // makes it circular
+                    {
+                        Vector3 chunk = new Vector3(i + chunkPosition.X, 0, j + chunkPosition.Z);
+                        if (chunk.X > 0 && chunk.Z > 0)
+                        {
+                            loadedChunks.Add(chunk);
+                        }
+                    }
+                }
+            }
+            if (chunkHash != GetListHashCode(loadedChunks)) // data changed, reload chunks
+            {
+                RenderData.dirty = true;
 
-            if (RenderData.dirty == true)// checks if the data is dirty
+                List<Vector3> loadedIntoSheet = new List<Vector3>();
+
+                for (int i = 0; i < renderData.Count; i++)
+                {
+                    if (renderData[i].id == "Chunk")
+                    {
+                        if (!loadedChunks.Contains(renderData[i].position)) // delete this chunk
+                        {
+                            renderData.RemoveAt(i);
+                        }
+                        else 
+                        {
+                            loadedIntoSheet.Add(renderData[i].position);
+                        }
+                    }
+                }
+                for (int i = 0; i < loadedChunks.Count; i++)
+                {
+                    if (!loadedIntoSheet.Contains(loadedChunks[i]))
+                    {
+                        renderData.Add(new RenderData("Chunk", loadedChunks[i], world.GetChunkMesh(new Vector2(loadedChunks[i].X, loadedChunks[i].Z), new Vector3(0, 0, 0))));     
+                    }
+                }
+            }
+            if (RenderData.dirty == true) // checks if the data is dirty
             {
                 RenderData.dirty = false;
                 List<VertexPositionTexture> worldMesh = new List<VertexPositionTexture>();
@@ -288,6 +336,18 @@ namespace FormGame
                 GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, triangleCount / 3);
             }
             base.Draw(gameTime);
+        }
+        static int GetListHashCode(List<Vector3> list)
+        {
+            unchecked
+            {
+                int hash = 19;
+                foreach (Vector3 item in list)
+                {
+                    hash = hash * 31 + item.GetHashCode();
+                }
+                return hash;
+            }
         }
     }
 }
